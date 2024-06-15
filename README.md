@@ -38,6 +38,23 @@ MonoPerfCap dataset:
 
 `python run_render.py --config-name perfcap_relight model_config=logs/PerfCap_nadia/config.yaml +ckpt_path=[PATH TO .th CHECKPOINT] output_path=[PATH TO OUTPUT FOLDER]`
 
+## Results
+
+### Training Joint Optimization (Neural Field, Gaussians, Lighting)
+
+### Novel Pose Synthesis
+
+Synthetic Sequence:
+![Novel Pose Synthesis Syntetic Sequence GIF](assets/novelpose_synthetic.gif)
+
+Real Sequence:
+![Novel Pose Synthesis Real Sequence GIF](assets/novelpose_real.gif)
+
+### HDRi Relighting
+
+autumn_field_4k:
+![Novel Pose Synthesis Real Sequence GIF](assets/relit_1.gif)
+
 ## Citation
 
 ```
