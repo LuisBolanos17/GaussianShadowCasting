@@ -14,3 +14,7 @@ h5py
 PyMCubes
 trimesh
 scikit-image
+scikit-video
+ipykernel
+wget
+requests
