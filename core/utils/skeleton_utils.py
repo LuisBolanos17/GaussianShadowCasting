@@ -10,7 +10,7 @@ from collections import namedtuple
 from scipy.spatial.transform import Rotation
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-import pytorch3d.transforms.rotation_conversions as p3dr
+import core.utils.rotation_conversions as p3dr
 
 """
 from pytorch3d.utils.camera_conversions import cameras_from_opencv_projection

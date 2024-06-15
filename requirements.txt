@@ -1,0 +1,16 @@
+hydra-core
+imageio
+tqdm
+opencv-python
+plotly
+scipy
+matplotlib
+einops
+tensorboard
+lpips
+smplx
+pytorch-msssim @ git+https://github.com/LemonATsu/pytorch-msssim.git@f77a2446d0688f88ab935ea2e0fdada7691b83b0
+h5py
+PyMCubes
+trimesh
+scikit-image

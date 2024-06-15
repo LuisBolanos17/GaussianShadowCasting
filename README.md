@@ -8,7 +8,14 @@
 
 ## Setup
 
-Please follow https://github.com/LemonATsu/NPC-pytorch/tree/main for setup guidelines.
+```
+conda create -n gsc python=3.9
+conda activate gsc
+
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+pip install -r requirements.txt
+```
 
 ## Dataset
 
