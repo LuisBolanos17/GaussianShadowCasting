@@ -1,6 +1,10 @@
 # Gaussian Shadow Casting for Neural Characters
 
-![Teaser](assets/teaser.mp4)
+![Teaser](assets/teaser.png)
+
+>**Gaussian Shadow Casting for Neural Characters**\
+>[Luis Bolanos](https://github.com/LuisBolanos17/), [Shih-Yang Su](https://lemonatsu.github.io/), and [Helge Rhodin](http://helge.rhodin.de/)\
+>CVPR 2024
 
 ## Setup
 
