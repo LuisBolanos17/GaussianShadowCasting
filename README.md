@@ -1,6 +1,6 @@
 # Gaussian Shadow Casting for Neural Characters
 
-![Teaser](assets/teaser.png)
+![Teaser](assets/relit_1.gif)
 
 >**Gaussian Shadow Casting for Neural Characters**\
 >[Luis Bolanos](https://github.com/LuisBolanos17/), [Shih-Yang Su](https://lemonatsu.github.io/), and [Helge Rhodin](http://helge.rhodin.de/)\
@@ -41,6 +41,7 @@ MonoPerfCap dataset:
 ## Results
 
 ### Training Joint Optimization (Neural Field, Gaussians, Lighting)
+![Training Progression GIF](assets/training.gif)
 
 ### Novel Pose Synthesis
 
@@ -52,8 +53,16 @@ Real Sequence:
 
 ### HDRi Relighting
 
+HDRis from https://polyhaven.com/hdris
+
 autumn_field_4k:
-![Novel Pose Synthesis Real Sequence GIF](assets/relit_1.gif)
+![HDRi Relit Autumn Field 4K](assets/relit_1.gif)
+veranda_4k:
+![HDRi Relit Veranda 4K](assets/relit_2.gif)
+kiara_8_sunset_4k:
+![HDRi Relit Kiara 8 Sunset 4K](assets/relit_3.gif)
+tricolor_points (custom):
+![HDRi Relit Tricolor Points](assets/relit_4.gif)
 
 ## Citation
 
