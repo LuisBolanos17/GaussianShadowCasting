@@ -1,0 +1,9 @@
+evaluator:
+  _target_: run_eval.Evaluator
+  apply_mask: True
+  num_workers: 8
+  fg_only: True
+  use_lpips: True
+  write_render: True
+  write_target: False
+  img_key: rgb_imgs

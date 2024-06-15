@@ -1,0 +1,122 @@
+defaults:
+  - basic
+  - dataset: rna
+
+eval_key: rgb_imgs
+psnr_key: rgb_map
+
+model:
+  _target_: core.networks.danbo.DANBO
+
+  D: 8
+  W: 256
+  view_W: 128
+  voxel_feat: 15
+  voxel_res: 16
+
+  skips: [4] # skip connection
+  use_framecodes: True
+  framecode_ch: 128
+  agg_type: sigmoid
+  pred_sdf: True
+  lazy_sdf: 4
+  use_curvature_loss: True
+  curvature_std: 0.02
+
+  graph_net:
+    _target_: core.networks.gnn_backbone.DANBOGNN
+    W: 128
+    D: 4
+    fc_D: 2
+    opt_scale: True
+  
+  voxel_agg_net:
+    _target_: core.networks.gnn_backbone.MixGNN
+    W: 32
+    D: 3
+    fc_D: 1
+
+  pts_embedder:
+    _target_: core.embedder.BoneAlignEmbedder
+
+  pts_posi_enc: # use on pose encoding
+    _target_: None
+
+  view_embedder:
+    _target_: core.embedder.WorldViewEmbedder
+
+  view_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 4
+
+  pose_embedder:
+    _target_: core.embedder.Pose6DEmbedder
+
+  pose_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 5
+
+  voxel_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 6
+  
+  light_module:
+    _target_: core.networks.lighting.DirectionalLight
+    optimize_ambient: False
+    optimize_direction: False
+    direction: [[-0.66341394, 0.64278764, 0.38302219]] # GT light direction
+    ambient: [[0.5, 0.5, 0.5]] # GT ambient intensity
+    floor_point: [0, 0, 0]
+    floor_normal: [0,-1,0]
+
+  visibility_module:
+    _target_: core.networks.gaussian_light.GaussianVisibility
+    num_gaussians_per_bone: 4
+    filter_density: 'soft'
+    num_bones: 24 # 18 vitpose real | 20 vitposev2 | 22 synthetic mixamo | 24 smpl | 44 wolf
+  
+  raycaster:
+    _target_: core.raycast.VolRayCast
+    #_target_: core.raycast.RayCast
+    # TODO: maybe move it to the basic.yaml
+    N_samples: 48
+    N_importance: 24
+    nf_enlarge: 0.5
+    nf_enlarge_ratio: 0.25
+
+losses: 
+  SoftSoftmaxLoss:
+    weight: 0.001
+
+  VolScaleLoss:
+    weight: 0.001
+
+# is it an SDF?
+  EikonalLoss:
+    weight: 0.05
+
+# Directional Light Fit Losses SDF
+
+  AlbedoLoss:
+    fine: 1.0
+    coarse: 0.75
+    hold_off_iters: 0
+    interpolation_iters: 1
+    weight_a: 1.00
+    weight_b: 1.00
+
+  GaussianVisibilityLoss:
+    gaussian_sigma_weight: 0.5
+    gaussian_mean_weight: 0.25
+    hold_off_iters: 1500
+    interpolation_iters: 1500
+    weight_a: 0.00
+    weight_b: 0.10
+
+  CurvatureLoss:
+    weight: 0.5
+    angle_loss: True
+  
+trainer:
+  #reset_rgb_head_iter: 4000
+  fix_danbo_box_params: 15000

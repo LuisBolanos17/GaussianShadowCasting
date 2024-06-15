@@ -1,0 +1,19 @@
+render_dataset:
+  _target_: run_render.BaseRenderDataset
+  subject: nadia
+  h5_path: data/MonoPerfCap/${.subject}_outdoor/${.subject}_outdoor_corrected.h5
+  #h5_path: data/h36m_zju/${.subject}_train.h5
+  #idxs: np.arange(780)
+  #idxs: np.arange(133)
+  #idxs: np.arange(82)
+  #idxs: np.arange(1635)[-327:][::5]
+  idxs: np.arange(1151)[-327:][::5]
+  #resolution: [1080, 1920]
+  resolution: [540, 960]
+  cam_overwrite: 1307
+  cam_scale: 1.05
+  undo_pose_scale: True
+
+
+model_config: ???
+output_path: ???

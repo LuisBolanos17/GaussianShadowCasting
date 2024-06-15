@@ -1,0 +1,9 @@
+_target_: core.datasets.ZJUMocapDataset
+h5_path: data/zju_mocap/${.subject}_train.h5
+
+
+split: train
+patch_size: 1
+subject: 377
+mask_img: True
+perturb_bg: True

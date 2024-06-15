@@ -1,0 +1,44 @@
+defaults:
+  - basic
+  - dataset: h36m_zju
+
+model:
+  _target_: core.networks.anerf.ANeRF
+
+  D: 8
+  W: 256
+  view_W: 128
+  skips: [4] # skip connection
+  use_framecodes: True
+  framecode_ch: 128
+
+  pts_embedder:
+    _target_: core.embedder.SkeletonRelativeEmbedder
+
+  pts_posi_enc:
+    _target_: core.positional_enc.CutoffPositionalEncoding
+    num_freqs: 8
+
+  view_embedder:
+    _target_: core.embedder.SkeletonRelativeViewEmbedder
+
+  view_posi_enc:
+    _target_: core.positional_enc.CutoffPositionalEncoding
+    num_freqs: 4
+  
+  raycaster:
+    _target_: core.raycast.RayCast
+    # TODO: maybe move it to the basic.yaml
+    N_samples: 48
+    N_importance: 32
+  
+  pose_opt:
+    _target_: core.networks.pose_opt.PoseOpt
+  
+trainer:
+  pose_opt: true
+  
+losses:
+  NeRFRGBLoss:
+    fine: 1.0
+    coarse: 1.0

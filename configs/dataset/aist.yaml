@@ -1,0 +1,9 @@
+_target_: core.datasets.AISTDataset
+h5_path: data/AIST/${.subject}_train.h5
+
+
+split: train
+patch_size: 1
+subject: d12
+mask_img: True
+perturb_bg: True

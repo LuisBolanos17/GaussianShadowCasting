@@ -1,0 +1,20 @@
+saved_keys: ['rgb_imgs', 'rgb_lit_imgs', 'normal_viz_imgs', 'shadow_imgs', 'diffuse_imgs', 'irradiance_imgs']
+
+use_hdri: True
+hdri_path: 'data/HDRis/rural_asphalt_road_4k.exr'
+num_secondary_rays: 8
+forward_type: render_relight
+
+render_dataset:
+  _target_: run_render.RelightAnimalRenderDataset
+  subject: wolf
+  h5_path: data/animal/${.subject}_train.h5
+  idxs: np.array([150])
+  angles: [0,90,180,270]
+  resolution: [500, 500]
+  #cam_overwrite: -1
+  bkgd_to_use: white
+
+save_gt: True
+model_config: ???
+output_path: ???

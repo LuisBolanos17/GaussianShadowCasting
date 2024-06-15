@@ -1,0 +1,9 @@
+_target_: core.datasets.NeuralActorDataset
+h5_path: data/neuralactor/${.subject}_train_sub_4c.h5
+
+
+split: train
+patch_size: 1
+subject: vlad
+mask_img: True
+perturb_bg: True

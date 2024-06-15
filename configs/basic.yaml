@@ -1,0 +1,40 @@
+basedir: logs  # path to log directory
+expname: model # log directly name
+
+# dataset general
+num_workers: 16
+sampler:
+  _target_: core.datasets.samplers.RayImageSampler
+
+# hyperparameters
+N_rays: 1024
+N_sample_images: 16
+iters: 150000
+N_samples: 48
+N_imporantce: 24
+
+# logging
+i_print: 100
+i_save: 10000
+i_testset: 100000
+i_trainingviz: 5000
+trainingviz_frame: 36
+render_factor: 1 #2 # factor to down size the rendered image during testing
+eval_key: rgb_imgs
+psnr_key: rgb_map
+
+trainer:
+  psnr_key: ${psnr_key}
+  optim: 
+    _target_: torch.optim.Adam
+    lr: 5e-4
+  lr_sched:
+    decay_type: 'standard'
+    decay_steps: 500000 # steps to reach the designated lr decay rate
+    decay_rate: 0.1
+    delay_steps: 2000
+  
+losses: ???
+
+model: ???
+dataset: ???

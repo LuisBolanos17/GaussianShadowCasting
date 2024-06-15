@@ -1,0 +1,76 @@
+defaults:
+  - basic
+  - dataset: h36m_zju
+
+eval_key: rgb_imgs
+psnr_key: rgb_map
+
+model:
+  _target_: core.networks.danbo.DANBO
+
+  D: 8
+  W: 256
+  view_W: 128
+  voxel_feat: 15
+  voxel_res: 16
+
+  skips: [4] # skip connection
+  use_framecodes: True
+  framecode_ch: 128
+  agg_type: sigmoid
+
+  graph_net:
+    _target_: core.networks.gnn_backbone.DANBOGNN
+    W: 128
+    D: 4
+    fc_D: 2
+    opt_scale: True
+  
+  voxel_agg_net:
+    _target_: core.networks.gnn_backbone.MixGNN
+    W: 32
+    D: 3
+    fc_D: 1
+
+  pts_embedder:
+    _target_: core.embedder.BoneAlignEmbedder
+
+  pts_posi_enc: # use on pose encoding
+    _target_: None
+
+  view_embedder:
+    _target_: core.embedder.WorldToRootViewEmbedder
+
+  view_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 4
+
+  pose_embedder:
+    _target_: core.embedder.Pose6DEmbedder
+
+  pose_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 5
+
+  voxel_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 6
+  
+  raycaster:
+    _target_: core.raycast.VolRayCast
+    #_target_: core.raycast.RayCast
+    # TODO: maybe move it to the basic.yaml
+    N_samples: 48
+    N_importance: 24
+
+losses:
+  NeRFRGBLoss:
+    fine: 1.0
+    coarse: 1.0
+  
+  SoftSoftmaxLoss:
+    weight: 0.001
+
+  VolScaleLoss:
+    weight: 0.001
+  

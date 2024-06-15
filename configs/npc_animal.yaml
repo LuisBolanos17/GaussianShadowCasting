@@ -1,0 +1,164 @@
+defaults:
+  - basic
+  - dataset: animal
+
+model_base: core.networks.npc
+model_name: NPC
+gnn_base: core.networks.gnn_backbone
+gnn_name: PointDeformGNNLBSSepAug
+hash_base: core.networks.space_hash
+hash_name: PointTriVectorHashWithPayload 
+raycaster_name: VolRayCast
+#hash_name: PointRandFeature
+anchor_folder: extracted_points/
+anchor_file: anchor_pts_${dataset.subject}.th
+model:
+  _target_: ${model_base}.${model_name}
+
+  D: 8
+  W: 256
+  view_W: 128
+  voxel_feat: 15
+  voxel_res: 16
+  anchor_feat: 36
+  shade_feat: 0
+  aug_feat: 8
+  nerf_feat: 32
+  knn_points: 8
+  knn_volumes: 3
+  points_per_volume: 150
+  anchor_constraint: True
+  constraint_pts: 100
+  rbf_threshold: 0
+  pred_sdf: True
+  use_viewdir: False
+  no_rw: False
+  dropout: 0.8
+  use_temporal: False
+  fixed_neighbor: True
+  block_irrel: True
+
+  skips: [4] # skip connection
+  use_framecodes: False
+  framecode_ch: 128
+  agg_type: sigmoid
+
+  update_config:
+    update_steps: [4000000, 100000000, 200000000]
+    increase: 50
+
+  anchor_config:
+    points_per_volume: ${model.points_per_volume}
+    anchor_feat: ${model.anchor_feat}
+    anchor_file: ${anchor_folder}${anchor_file}
+    opt_anchor_locs: True
+    anchor_rbf_var: 0.0005
+    #anchor_rbf_var: 0.0010
+    learn_rbf_var: True
+    anchor_hash: 
+      _target_: ${hash_base}.${hash_name}
+      n_in: 128
+      n_out: ${model.anchor_feat}
+      n_pts: ${model.points_per_volume}
+      n_payload: 9
+      hash_res: 12
+
+    anchor_side_hash: 
+      _target_: ${hash_base}.${hash_name}
+      n_in: 33
+      n_out: 5
+      n_pts: ${model.points_per_volume}
+  
+  deform_net:
+    _target_: ${gnn_base}.${gnn_name}
+    W: 128
+    RW: 96
+    RD: 4
+    D: 4
+    fc_D: 2
+    modulate_size: 1
+    #anchor_feat: 16
+    opt_scale: False 
+    no_rot: True
+    deform_scale: 0.0
+    num_freqs: 0
+    n_hops: 4
+  
+  graph_net: # just a place holder
+    _: 0
+  
+  pts_embedder:
+    _target_: core.embedder.BoneAlignEmbedder
+
+  pts_posi_enc: # use on pose encoding
+    _target_: None
+
+  view_embedder:
+    #_target_: core.embedder.WorldToRootViewEmbedder
+    _target_: core.embedder.BoneAlignViewEmbedder
+
+  view_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 2
+
+  pose_embedder:
+    _target_: core.embedder.Pose6DEmbedder
+
+  pose_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 5
+
+  voxel_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 6
+    #include_input: False
+  
+  raycaster:
+    #_target_: core.raycast.VolRayCast
+    _target_: core.raycast.${raycaster_name}
+    #_target_: core.raycast.RayCast
+    # TODO: maybe move it to the basic.yaml
+    N_samples: 64
+    N_importance: 32
+
+losses:
+  NeRFRGBMSELoss:
+    fine: 1.0
+    coarse: 1.0
+
+  PointDeformLoss:
+    weight: 1.0
+  
+  AnchorEikonalLoss:
+    weight: 0.01 
+    schedule: False
+    steps: 10000
+  
+  AnchorDistLoss:
+    weight: 10.0 #1000.0
+
+  AnchorSurfaceLoss:
+    weight: 0.1
+  
+  SigmaLoss:
+    weight: 0.0
+  
+  RBFScaleMonitor:
+    weight: 0.0
+  
+  KNNRWLoss:
+    weight: 1.0
+  
+
+  
+trainer:
+  optim: 
+    _target_: torch.optim.Adam
+    lr: 5e-4
+  lr_sched:
+    decay_type: 'standard'
+    decay_steps: 500000 # steps to reach the desinated lr decay rate
+    decay_rate: 0.2
+    delay_steps: 5000
+  
+N_rays: 4096

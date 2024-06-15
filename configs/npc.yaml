@@ -1,0 +1,137 @@
+defaults:
+  - basic
+  - dataset: h36m_zju
+
+pts_base: core.networks.pts
+pts_name: NPCPointClouds
+model_base: core.networks.npc
+model_name: NPC
+gnn_base: core.networks.gnn_backbone
+gnn_name: NPCGNNFiLM
+vol_base: core.networks.factorized_vol_feat
+vol_name: Vector3DFeaturesWithIndividualFeature
+bone_vol_name: Vector3DFeaturesLatent
+raycaster_name: VolRayCast
+anchor_folder: extracted_points/
+anchor_file: anchor_pts_${dataset.subject}.th
+model:
+  _target_: ${model_base}.${model_name}
+
+  D: 8
+  W: 256
+  view_W: 128
+  anchor_constraint: True
+  pred_sdf: True
+  use_viewdir: True
+
+  skips: [4] # skip connection
+  use_framecodes: True
+  framecode_ch: 128
+  agg_type: sigmoid
+
+  deform_config:
+    _target_: ${gnn_base}.${gnn_name}
+    W: 128
+    D: 4
+    RW: 96
+    RD: 4
+    fc_D: 2
+    num_freqs: 0
+    opt_scale: False
+    deform_scale: 0.01
+    n_pose_feat: 8
+    pts_per_volume: ${model.pts_config.pts_per_volume}
+
+  pts_config:
+    _target_: ${pts_base}.${pts_name}
+    block_irrel: True
+    n_hops: 2
+    knn_vols: 3
+    knn_pts: 8
+    init_pts_k: 8
+    pts_per_volume: 200
+    pts_file: ${anchor_folder}${anchor_file}
+    init_pts_beta: 0.0005
+
+    feat_config:
+      _target_: ${vol_base}.${vol_name}
+      n_in: 0
+      n_out: 36
+      n_pts: ${model.pts_config.pts_per_volume}
+      n_ind: 9
+      feat_res: 12
+    
+    bone_config:
+      _target_: ${vol_base}.${bone_vol_name}
+      n_in: 32
+      n_out: 6
+      feat_res: 16
+      
+  
+  bkgd_net:
+    _target_: core.networks.bkgd_network.BkgdNet
+    W: 256
+    img_res: [1000, 1000] # change this accordingly!
+    warmup: 10000
+
+  pts_embedder:
+    _target_: core.embedder.BoneAlignEmbedder
+
+  pts_posi_enc: # use on pose encoding
+    _target_: None
+
+  view_embedder:
+    _target_: core.embedder.BoneAlignViewEmbedder
+
+  view_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 2
+
+  pose_embedder:
+    _target_: core.embedder.Pose6DEmbedder
+
+  pose_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 5
+
+  voxel_posi_enc:
+    _target_: core.positional_enc.PositionalEncoding
+    num_freqs: 6
+    #include_input: False
+  
+  raycaster:
+    _target_: core.raycast.${raycaster_name}
+    N_samples: 64
+    N_importance: 32
+
+losses:
+  NeRFRGBLoss:
+    fine: 1.0
+    coarse: 1.0
+  
+  PointDeformLoss:
+    weight: 1.0
+
+  PointCloudsEikonalLoss:
+    weight: 0.01 
+  
+  PointCloudsNeighborLoss:
+    weight: 10.0 #1000.0
+
+  PointCloudsSurfaceLoss:
+    weight: 0.1
+
+  BkgdLoss:
+    weight: 1.0
+  
+trainer:
+  optim: 
+    _target_: torch.optim.Adam
+    lr: 5e-4
+  lr_sched:
+    decay_type: 'standard'
+    decay_steps: 500000 # steps to reach the desinated lr decay rate
+    decay_rate: 0.2
+    delay_steps: 5000
+  
+N_rays: 4096
