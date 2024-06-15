@@ -1,5 +1,7 @@
 # Gaussian Shadow Casting for Neural Characters
-![](assets/npc_relighting_combined.mp4)
+
+![Teaser](assets/teaser.mp4)
+
 ## Setup
 
 Please follow https://github.com/LemonATsu/NPC-pytorch/tree/main for setup guidelines.
