@@ -1,4 +1,5 @@
 # Gaussian Shadow Casting for Neural Characters
+[Paper](https://arxiv.org/abs/2401.06116)
 
 ![Teaser](assets/relit_1.gif)
 
